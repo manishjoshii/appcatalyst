@@ -1,6 +1,7 @@
 spring:
   application:
     name: appcatalyst
+    description: this is application
 
   datasource:
     url: jdbc:postgresql://localhost:5432/appcatalyst
@@ -14,4 +15,7 @@ spring:
     show-sql: true
     properties:
       hibernate:
-        format_sql: true
+        format_sql: false
+
+jwt:
+  secret-key: TG7rAfx79XsVtPWBx-6c6D4uImcPPVvPDGhRfUHiVFheUjR7Bz7Zqk6h9DrmN5jprB5kmHBPvbycqooVL83ljw
