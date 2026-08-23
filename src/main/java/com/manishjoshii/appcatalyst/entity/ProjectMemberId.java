@@ -1,13 +1,14 @@
 package com.manishjoshii.appcatalyst.entity;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.FieldDefaults;
+import jakarta.persistence.Embeddable;
+import lombok.*;
 
+@Embeddable
 @Getter
 @Setter
-@FieldDefaults(level = AccessLevel.PRIVATE)
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode
 public class ProjectMemberId {
     Long projectId;
     Long userId;

@@ -1,5 +1,6 @@
 package com.manishjoshii.appcatalyst.entity;
 
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
