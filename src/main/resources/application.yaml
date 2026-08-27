@@ -3,6 +3,9 @@ spring:
     name: appcatalyst
     description: this is application
 
+  config:
+    import: "optional:file:.env[.properties]"
+
   datasource:
     url: jdbc:postgresql://localhost:5432/appcatalyst
     username: postgres
@@ -19,3 +22,11 @@ spring:
 
 jwt:
   secret-key: TG7rAfx79XsVtPWBx-6c6D4uImcPPVvPDGhRfUHiVFheUjR7Bz7Zqk6h9DrmN5jprB5kmHBPvbycqooVL83ljw
+
+stripe:
+  api:
+    secret: ${STRIPE_API_SECRET}
+  webhook:
+    secret: ${STRIPE_WEBHOOK_SECRET}
+
+client.url: http://localhost:8080
