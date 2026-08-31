@@ -8,6 +8,7 @@ import com.manishjoshii.appcatalyst.entity.ProjectMember;
 import com.manishjoshii.appcatalyst.entity.ProjectMemberId;
 import com.manishjoshii.appcatalyst.entity.User;
 import com.manishjoshii.appcatalyst.enums.ProjectRole;
+import com.manishjoshii.appcatalyst.error.BadRequestException;
 import com.manishjoshii.appcatalyst.error.ResourceNotFoundException;
 import com.manishjoshii.appcatalyst.mapper.ProjectMapper;
 import com.manishjoshii.appcatalyst.repository.ProjectMemberRepository;
@@ -15,6 +16,7 @@ import com.manishjoshii.appcatalyst.repository.ProjectRepository;
 import com.manishjoshii.appcatalyst.repository.UserRepository;
 import com.manishjoshii.appcatalyst.security.AuthUtil;
 import com.manishjoshii.appcatalyst.service.ProjectService;
+import com.manishjoshii.appcatalyst.service.SubscriptionService;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -37,9 +39,15 @@ public class ProjectServiceImpl implements ProjectService {
     ProjectMapper projectMapper;
     ProjectMemberRepository projectMemberRepository;
     AuthUtil authUtil;
+    SubscriptionService subscriptionService;
 
     @Override
     public ProjectResponse createProject(ProjectRequest request) {
+
+        if(!subscriptionService.canCreateNewProject()) {
+            throw new BadRequestException("User cannot create a New project with current Plan, Upgrade plan now.");
+        }
+
         Long userId = authUtil.getCurrentUserId();
 //        User owner = userRepository.findById(userId).orElseThrow(
 //                () -> new ResourceNotFoundException("User", userId.toString())

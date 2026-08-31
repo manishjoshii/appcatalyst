@@ -6,6 +6,7 @@ import com.manishjoshii.appcatalyst.dto.subscription.PortalResponse;
 import com.manishjoshii.appcatalyst.entity.Plan;
 import com.manishjoshii.appcatalyst.entity.User;
 import com.manishjoshii.appcatalyst.enums.SubscriptionStatus;
+import com.manishjoshii.appcatalyst.error.BadRequestException;
 import com.manishjoshii.appcatalyst.error.ResourceNotFoundException;
 import com.manishjoshii.appcatalyst.repository.PlanRepository;
 import com.manishjoshii.appcatalyst.repository.UserRepository;
@@ -78,7 +79,26 @@ public class StripePaymentProcessor implements PaymentProcessor {
 
     @Override
     public PortalResponse openCustomerPortal() {
-        return null;
+        Long userId = authUtil.getCurrentUserId();
+        User user = getUser(userId);
+        String stripeCustomerId = user.getStripeCustomerId();
+
+        if(stripeCustomerId == null || stripeCustomerId.isEmpty()) {
+            throw new BadRequestException("User does not have a Stripe Customer Id, UserId:"+userId);
+        }
+
+        try {
+            var portalSession = com.stripe.model.billingportal.Session.create(
+                    com.stripe.param.billingportal.SessionCreateParams.builder()
+                            .setCustomer(stripeCustomerId)
+                            .setReturnUrl(frontendUrl)
+                            .build()
+            );
+
+            return new PortalResponse(portalSession.getUrl());
+        } catch (StripeException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
