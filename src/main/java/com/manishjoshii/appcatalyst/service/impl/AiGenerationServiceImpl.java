@@ -1,6 +1,8 @@
 package com.manishjoshii.appcatalyst.service.impl;
 
 import com.manishjoshii.appcatalyst.llm.PromptUtils;
+import com.manishjoshii.appcatalyst.llm.advisors.FileTreeContextAdvisor;
+import com.manishjoshii.appcatalyst.llm.tools.CodeGenerationTools;
 import com.manishjoshii.appcatalyst.security.AuthUtil;
 import com.manishjoshii.appcatalyst.service.AiGenerationService;
 import com.manishjoshii.appcatalyst.service.ProjectFileService;
@@ -25,6 +27,7 @@ public class AiGenerationServiceImpl implements AiGenerationService {
     private final ChatClient chatClient;
     private final AuthUtil authUtil;
     private final ProjectFileService projectFileService;
+    private final FileTreeContextAdvisor fileTreeContextAdvisor;
 
     private static final Pattern FILE_TAG_PATTERN = Pattern.compile("<file path=\"([^\"]+)\">(.*?)</file>", Pattern.DOTALL);
 
@@ -41,11 +44,15 @@ public class AiGenerationServiceImpl implements AiGenerationService {
 
         StringBuilder fullResponseBuffer = new StringBuilder();
 
+        CodeGenerationTools codeGenerationTools = new CodeGenerationTools(projectFileService, projectId);
+
         return chatClient.prompt()
                 .system(PromptUtils.CODE_GENERATION_SYSTEM_PROMPT)
                 .user(userMessage)
+                .tools(codeGenerationTools)
                 .advisors(advisorSpec -> {
                             advisorSpec.params(advisorParams);
+                            advisorSpec.advisors(fileTreeContextAdvisor);
                         }
                 )
                 .stream()

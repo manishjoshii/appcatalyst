@@ -23,11 +23,12 @@ spring:
   ai:
     openai:
       api-key: ${OPENROUTER_API_KEY}
-      base-url: https://openrouter.ai/api
+      base-url: https://openrouter.ai/api/v1
+      timeout: 10m
       chat:
-        options:
-          model: openrouter/free
-          temperature: 0.0
+        model: minimax/minimax-m3:free
+        temperature: 0.0
+        max-tokens: 262144
 
 jwt:
   secret-key: TG7rAfx79XsVtPWBx-6c6D4uImcPPVvPDGhRfUHiVFheUjR7Bz7Zqk6h9DrmN5jprB5kmHBPvbycqooVL83ljw
