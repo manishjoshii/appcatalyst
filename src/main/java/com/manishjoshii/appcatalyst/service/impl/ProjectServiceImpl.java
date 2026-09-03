@@ -16,6 +16,7 @@ import com.manishjoshii.appcatalyst.repository.ProjectRepository;
 import com.manishjoshii.appcatalyst.repository.UserRepository;
 import com.manishjoshii.appcatalyst.security.AuthUtil;
 import com.manishjoshii.appcatalyst.service.ProjectService;
+import com.manishjoshii.appcatalyst.service.ProjectTemplateService;
 import com.manishjoshii.appcatalyst.service.SubscriptionService;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
@@ -40,6 +41,7 @@ public class ProjectServiceImpl implements ProjectService {
     ProjectMemberRepository projectMemberRepository;
     AuthUtil authUtil;
     SubscriptionService subscriptionService;
+    ProjectTemplateService projectTemplateService;
 
     @Override
     public ProjectResponse createProject(ProjectRequest request) {
@@ -57,7 +59,7 @@ public class ProjectServiceImpl implements ProjectService {
         Project project = Project.builder()
                 .name(request.name())
                 .isPublic(false)
-                .build();
+            .build();
         project = projectRepository.save(project);
 
 
@@ -71,6 +73,8 @@ public class ProjectServiceImpl implements ProjectService {
                 .project(project)
                 .build();
         projectMemberRepository.save(projectMember);
+
+        projectTemplateService.initializeProjectFromTemplate(project.getId());
 
         return projectMapper.toProjectResponse(project);
     }
