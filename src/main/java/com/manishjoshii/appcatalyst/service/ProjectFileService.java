@@ -1,12 +1,10 @@
 package com.manishjoshii.appcatalyst.service;
 
 import com.manishjoshii.appcatalyst.dto.project.FileContentResponse;
-import com.manishjoshii.appcatalyst.dto.project.FileNode;
-
-import java.util.List;
+import com.manishjoshii.appcatalyst.dto.project.FileTreeResponse;
 
 public interface ProjectFileService {
-    List<FileNode> getFileTree(Long projectId);
+    FileTreeResponse getFileTree(Long projectId);
 
     FileContentResponse getFileContent(Long projectId, String path);
 

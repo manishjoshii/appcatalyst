@@ -2,6 +2,7 @@ package com.manishjoshii.appcatalyst.service.impl;
 
 import com.manishjoshii.appcatalyst.dto.project.FileContentResponse;
 import com.manishjoshii.appcatalyst.dto.project.FileNode;
+import com.manishjoshii.appcatalyst.dto.project.FileTreeResponse;
 import com.manishjoshii.appcatalyst.entity.Project;
 import com.manishjoshii.appcatalyst.entity.ProjectFile;
 import com.manishjoshii.appcatalyst.error.ResourceNotFoundException;
@@ -40,9 +41,10 @@ public class ProjectFileServiceImpl implements ProjectFileService {
     private static final String BUCKET_NAME = "projects";
 
     @Override
-    public List<FileNode> getFileTree(Long projectId) {
+    public FileTreeResponse getFileTree(Long projectId) {
         List<ProjectFile> projectFileList = projectFileRepository.findByProjectId(projectId);
-        return projectFileMapper.toListOfFileNode(projectFileList);
+        List<FileNode> projectFileNodes = projectFileMapper.toListOfFileNode(projectFileList);
+        return new FileTreeResponse(projectFileNodes);
     }
 
     @Override
