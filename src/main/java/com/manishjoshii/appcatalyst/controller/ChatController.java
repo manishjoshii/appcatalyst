@@ -2,6 +2,7 @@ package com.manishjoshii.appcatalyst.controller;
 
 import com.manishjoshii.appcatalyst.dto.chat.ChatRequest;
 import com.manishjoshii.appcatalyst.dto.chat.ChatResponse;
+import com.manishjoshii.appcatalyst.dto.chat.StreamResponse;
 import com.manishjoshii.appcatalyst.service.AiGenerationService;
 import com.manishjoshii.appcatalyst.service.ChatService;
 import lombok.RequiredArgsConstructor;
@@ -15,22 +16,23 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api/chat")
 public class ChatController {
 
     private final AiGenerationService aiGenerationService;
     private final ChatService chatService;
 
-    @PostMapping(value = "/api/chat/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<ServerSentEvent<String>> streamChat(
+    @PostMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<ServerSentEvent<StreamResponse>> streamChat(
             @RequestBody ChatRequest request) {
 
         return aiGenerationService.streamResponse(request.message(), request.projectId())
-                .map(data -> ServerSentEvent.<String>builder()
+                .map(data -> ServerSentEvent.<StreamResponse>builder()
                         .data(data)
                         .build());
     }
 
-    @GetMapping({"/api/chat/projects/{projectId}", "/projects/{projectId}"})
+    @GetMapping("/projects/{projectId}")
     public ResponseEntity<List<ChatResponse>> getChatHistory(
             @PathVariable Long projectId) {
 
