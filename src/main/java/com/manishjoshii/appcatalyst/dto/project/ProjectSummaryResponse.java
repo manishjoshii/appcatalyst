@@ -1,11 +1,14 @@
 package com.manishjoshii.appcatalyst.dto.project;
 
+import com.manishjoshii.appcatalyst.enums.ProjectRole;
+
 import java.time.Instant;
 
 public record ProjectSummaryResponse(
         Long id,
-        String projectName,
+        String name,
         Instant createdAt,
-        Instant updatedAt
+        Instant updatedAt,
+        ProjectRole role
 ) {
 }
