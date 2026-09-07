@@ -20,6 +20,11 @@ spring:
       hibernate:
         format_sql: false
 
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
   ai:
     openai:
       api-key: ${OPENROUTER_API_KEY}
