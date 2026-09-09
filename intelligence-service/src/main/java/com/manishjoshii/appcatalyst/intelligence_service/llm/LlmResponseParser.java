@@ -1,5 +1,6 @@
 package com.manishjoshii.appcatalyst.intelligence_service.llm;
 
+import com.manishjoshii.appcatalyst.common_lib.enums.ChatEventStatus;
 import com.manishjoshii.appcatalyst.common_lib.enums.ChatEventType;
 import com.manishjoshii.appcatalyst.intelligence_service.entity.ChatEvent;
 import com.manishjoshii.appcatalyst.intelligence_service.entity.ChatMessage;
@@ -59,6 +60,7 @@ public class LlmResponseParser {
                 case "message" -> builder.type(ChatEventType.MESSAGE);
                 case "file" -> {
                     builder.type(ChatEventType.FILE_EDIT);
+                    builder.status(ChatEventStatus.PENDING);
                     builder.filePath(attrMap.get("path")); // Required for files
 //                    builder.content(null);
                 }
