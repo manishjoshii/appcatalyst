@@ -9,6 +9,5 @@ import org.mapstruct.Mapping;
 public interface ProjectMemberMapper {
 
     @Mapping(target = "userId", source = "id.userId")
-    @Mapping(target = "role", source = "projectRole")
     MemberResponse toProjectMemberResponseFromMember(ProjectMember projectMember);
 }

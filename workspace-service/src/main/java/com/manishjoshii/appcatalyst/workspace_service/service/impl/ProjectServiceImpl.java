@@ -1,6 +1,7 @@
 package com.manishjoshii.appcatalyst.workspace_service.service.impl;
 
 import com.manishjoshii.appcatalyst.common_lib.dto.PlanDto;
+import com.manishjoshii.appcatalyst.common_lib.enums.ProjectPermission;
 import com.manishjoshii.appcatalyst.common_lib.enums.ProjectRole;
 import com.manishjoshii.appcatalyst.common_lib.error.BadRequestException;
 import com.manishjoshii.appcatalyst.common_lib.error.ResourceNotFoundException;
@@ -15,6 +16,7 @@ import com.manishjoshii.appcatalyst.workspace_service.entity.ProjectMemberId;
 import com.manishjoshii.appcatalyst.workspace_service.mapper.ProjectMapper;
 import com.manishjoshii.appcatalyst.workspace_service.repository.ProjectMemberRepository;
 import com.manishjoshii.appcatalyst.workspace_service.repository.ProjectRepository;
+import com.manishjoshii.appcatalyst.workspace_service.security.SecurityExpressions;
 import com.manishjoshii.appcatalyst.workspace_service.service.ProjectService;
 import com.manishjoshii.appcatalyst.workspace_service.service.ProjectTemplateService;
 import jakarta.transaction.Transactional;
@@ -39,6 +41,7 @@ public class ProjectServiceImpl implements ProjectService {
     AuthUtil authUtil;
     ProjectTemplateService projectTemplateService;
     AccountClient accountClient;
+    SecurityExpressions securityExpressions;
 
     @Override
     public ProjectResponse createProject(ProjectRequest request) {
@@ -110,6 +113,11 @@ public class ProjectServiceImpl implements ProjectService {
 
         project.setDeletedAt(Instant.now());
         projectRepository.save(project);
+    }
+
+    @Override
+    public boolean hasPermission(Long projectId, ProjectPermission permission) {
+        return securityExpressions.hasPermission(projectId, permission);
     }
 
     ///  INTERNAL FUNCTIONS
