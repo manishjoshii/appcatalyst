@@ -87,17 +87,15 @@ public class AiGenerationServiceImpl implements AiGenerationService {
                 .stream()
                 .chatResponse()
                 .doOnNext(response -> {
-                    String content = extractText(response);
+                    if (response.getResults() != null && !response.getResults().isEmpty()) {
+                        String content = response.getResult().getOutput().getText();
 
-                    if(content != null && !content.isEmpty() && endTime.get() == 0) { // first non-empty chunk received
-                        endTime.set(System.currentTimeMillis());
-                    }
-
-                    if(response.getMetadata().getUsage() != null) {
-                        usageRef.set(response.getMetadata().getUsage());
-                    }
-
-                    if (content != null) {
+                        if(content != null && !content.isEmpty() && endTime.get() == 0) { // first non-empty chunk received
+                            endTime.set(System.currentTimeMillis());
+                        }
+                        if(response.getMetadata().getUsage() != null) {
+                            usageRef.set(response.getMetadata().getUsage());
+                        }
                         fullResponseBuffer.append(content);
                     }
                 })
@@ -125,8 +123,11 @@ public class AiGenerationServiceImpl implements AiGenerationService {
                     }
                 })
                 .map(response -> {
-                    String text = extractText(response);
-                    return new StreamResponse(text != null ? text : "");
+                    if (response.getResults() != null && !response.getResults().isEmpty()) {
+                        String text = response.getResult().getOutput().getText();
+                        return new StreamResponse(text != null ? text : "");
+                    }
+                    return new StreamResponse("");
                 });
     }
 
@@ -197,13 +198,5 @@ public class AiGenerationServiceImpl implements AiGenerationService {
             chatSession = chatSessionRepository.save(chatSession);
         }
         return chatSession;
-    }
-
-    private String extractText(org.springframework.ai.chat.model.ChatResponse response) {
-        if (response == null || response.getResult() == null || response.getResult().getOutput() == null) {
-            return null;
-        }
-
-        return response.getResult().getOutput().getText();
     }
 }
