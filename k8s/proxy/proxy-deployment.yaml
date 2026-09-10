@@ -1,0 +1,50 @@
+# k8s/proxy/proxy-deployment.yaml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: appcatalyst-proxy
+  namespace: appcatalyst-core
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: appcatalyst-proxy
+  template:
+    metadata:
+      labels:
+        app: appcatalyst-proxy
+    spec:
+      containers:
+        - name: appcatalyst-proxy
+          image: manishjoshiii/appcatalyst-proxy:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "250m"
+              memory: "512Mi"
+          envFrom:
+            - configMapRef:
+                name: appcatalyst-shared-config
+          env:
+            - name: REDIS_URL
+              value: "redis://redis-0.redis.appcatalyst-core.svc.cluster.local:6379" 
+            - name: PORT
+              value: "80"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: appcatalyst-proxy
+  namespace: appcatalyst-core
+spec:
+  selector:
+    app: appcatalyst-proxy
+  ports:
+    - port: 80
+      targetPort: 80

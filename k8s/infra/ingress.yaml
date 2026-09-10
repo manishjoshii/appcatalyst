@@ -1,0 +1,57 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: appcatalyst-main-ingress
+  namespace: appcatalyst-core
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+spec:
+  ingressClassName: "nginx"
+  rules:
+  # 1. Main Website Route (The Frontend!)
+  - host: "appcatalyst-studio.manishkjoshi.in"
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: appcatalyst-frontend
+            port:
+              number: 80
+              
+  - host: "www.appcatalyst-studio.manishkjoshi.in"
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: appcatalyst-frontend
+            port:
+              number: 80
+
+  # 2. Previews Route
+  - host: "*.previews.appcatalyst.manishkjoshi.in"
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: appcatalyst-proxy
+            port:
+              number: 80
+  
+  # 3. API Gateway Route
+  - host: "api.appcatalyst.manishkjoshi.in"
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: api-gateway
+            port:
+              number: 80
