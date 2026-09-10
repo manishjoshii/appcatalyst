@@ -30,12 +30,21 @@ public class CodeGenerationTools {
 
             log.info("Requested file: {}", cleanPath);
 
-            String content = workspaceClient.getFileContent(projectId, cleanPath);
+            try {
+                String content = workspaceClient.getFileContent(projectId, cleanPath);
 
-            result.add(String.format(
+                result.add(String.format(
                     "--- START OF FILE: %s ---\n%s\n--- END OF FILE ---",
-                    cleanPath, content
-            ));
+                        cleanPath, content
+                ));
+            } catch (Exception exception) {
+                log.error("Failed to read requested file: {}", cleanPath, exception);
+                result.add(String.format(
+                        "--- ERROR READING FILE: %s ---%n%s",
+                        cleanPath,
+                        exception.getMessage()
+                ));
+            }
 
         }
 

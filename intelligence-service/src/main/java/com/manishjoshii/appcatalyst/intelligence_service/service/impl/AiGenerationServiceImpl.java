@@ -36,7 +36,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
@@ -88,7 +87,7 @@ public class AiGenerationServiceImpl implements AiGenerationService {
                 .stream()
                 .chatResponse()
                 .doOnNext(response -> {
-                    String content = response.getResult().getOutput().getText();
+                    String content = extractText(response);
 
                     if(content != null && !content.isEmpty() && endTime.get() == 0) { // first non-empty chunk received
                         endTime.set(System.currentTimeMillis());
@@ -98,14 +97,20 @@ public class AiGenerationServiceImpl implements AiGenerationService {
                         usageRef.set(response.getMetadata().getUsage());
                     }
 
-                    fullResponseBuffer.append(content);
+                    if (content != null) {
+                        fullResponseBuffer.append(content);
+                    }
                 })
                 .doOnComplete(() -> {
                     Schedulers.boundedElastic().schedule(() -> {
 //                        parseAndSaveFiles(fullResponseBuffer.toString(), projectId);
 
                         long duration = (endTime.get() - startTime.get()) /  1000;
-                        finalizeChats(userMessage, chatSession, fullResponseBuffer.toString(), duration, usageRef.get(), userId);
+                        try {
+                            finalizeChats(userMessage, chatSession, fullResponseBuffer.toString(), duration, usageRef.get(), userId);
+                        } catch (Exception exception) {
+                            log.error("Failed to finalize chat for projectId: {}", projectId, exception);
+                        }
                     });
                 })
                 .doOnError(error -> {
@@ -120,11 +125,7 @@ public class AiGenerationServiceImpl implements AiGenerationService {
                     }
                 })
                 .map(response -> {
-                    if (response.getResult() == null || response.getResult().getOutput() == null) {
-                        return new StreamResponse("");
-                    }
-
-                    String text = response.getResult().getOutput().getText();
+                    String text = extractText(response);
                     return new StreamResponse(text != null ? text : "");
                 });
     }
@@ -143,7 +144,7 @@ public class AiGenerationServiceImpl implements AiGenerationService {
                         .chatSession(chatSession)
                         .role(MessageRole.USER)
                         .content(userMessage)
-                        .tokensUsed(usage.getPromptTokens())
+                        .tokensUsed(usage != null ? usage.getPromptTokens() : 0)
                         .build()
         );
 
@@ -151,7 +152,7 @@ public class AiGenerationServiceImpl implements AiGenerationService {
                 .role(MessageRole.ASSISTANT)
                 .content("Assistant Message here...")
                 .chatSession(chatSession)
-                .tokensUsed(usage.getCompletionTokens())
+                .tokensUsed(usage != null ? usage.getCompletionTokens() : 0)
                 .build();
 
         assistantChatMessage = chatMessageRepository.save(assistantChatMessage);
@@ -196,5 +197,13 @@ public class AiGenerationServiceImpl implements AiGenerationService {
             chatSession = chatSessionRepository.save(chatSession);
         }
         return chatSession;
+    }
+
+    private String extractText(org.springframework.ai.chat.model.ChatResponse response) {
+        if (response == null || response.getResult() == null || response.getResult().getOutput() == null) {
+            return null;
+        }
+
+        return response.getResult().getOutput().getText();
     }
 }
