@@ -33,3 +33,18 @@ build/
 ### VS Code ###
 .vscode/
 .idea
+
+### Node & Builds ###
+/node_modules
+/dist
+/build
+.DS_Store
+*.log
+*.tmp
+*.bak
+*.swp
+*.swo
+*.class
+*.jar
+*.war
+*.ear
