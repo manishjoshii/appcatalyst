@@ -28,6 +28,7 @@ import org.springframework.ai.chat.metadata.Usage;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;
 
@@ -107,8 +108,22 @@ public class AiGenerationServiceImpl implements AiGenerationService {
                         finalizeChats(userMessage, chatSession, fullResponseBuffer.toString(), duration, usageRef.get(), userId);
                     });
                 })
-                .doOnError(error -> log.error("Error during streaming for projectId: {}", projectId))
+                .doOnError(error -> {
+                    if (error instanceof WebClientResponseException exception) {
+                        log.error(
+                                "AI request failed: status={}, body={}",
+                                exception.getStatusCode(),
+                                exception.getResponseBodyAsString()
+                        );
+                    } else {
+                        log.error("Error during streaming for projectId: {}", projectId, error);
+                    }
+                })
                 .map(response -> {
+                    if (response.getResult() == null || response.getResult().getOutput() == null) {
+                        return new StreamResponse("");
+                    }
+
                     String text = response.getResult().getOutput().getText();
                     return new StreamResponse(text != null ? text : "");
                 });
