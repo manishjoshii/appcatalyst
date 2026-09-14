@@ -45,7 +45,7 @@ spec:
               number: 80
   
   # 3. API Gateway Route
-  - host: "api.appcatalyst.manishkjoshi.in"
+  - host: "api-appcatalyst.manishkjoshi.in"
     http:
       paths:
       - path: /
