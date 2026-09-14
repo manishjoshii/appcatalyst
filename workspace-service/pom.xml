@@ -204,7 +204,7 @@
                 <version>3.4.4</version>
                 <configuration>
                     <to>
-                        <image>docker.io/manishjoshii/appcatalyst-${project.name}:${project.version}</image>
+                        <image>docker.io/manishjoshiii/appcatalyst-${project.name}:${project.version}</image>
                         <tags>
                             <tag>latest</tag>
                         </tags>
