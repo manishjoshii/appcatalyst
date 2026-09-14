@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: appcatalyst-frontend
+  namespace: appcatalyst-core
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: appcatalyst-frontend
+  template:
+    metadata:
+      labels:
+        app: appcatalyst-frontend
+    spec:
+      containers:
+        - name: appcatalyst-frontend
+          image: manishjoshiii/appcatalyst-frontend:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 250m
+              memory: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: appcatalyst-frontend
+  namespace: appcatalyst-core
+spec:
+  type: ClusterIP
+  selector:
+    app: appcatalyst-frontend
+  ports:
+    - port: 80
+      targetPort: 80
