@@ -14,6 +14,14 @@ metadata:
   name: appcatalyst-previews
 
 ---
+# to create a separate ns for ingress-nginx controller and cloudflare tunnel
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ingress-nginx
+
+---
 # configmap for shared config values across services
 
 apiVersion: v1
