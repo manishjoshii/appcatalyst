@@ -1,0 +1,41 @@
+server:
+  port: 9030
+  servlet:
+    context-path: /intelligence
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:9010/appcatalyst-intelligence-db
+    username: user
+    password: password
+    driver-class-name: org.postgresql.Driver
+
+  ai:
+    openai:
+      api-key: YOUR_AI_API_KEY
+      base-url: https://openrouter.ai/api
+      timeout: 10m
+      chat:
+        options:
+          model: deepseek/deepseek-v4-flash-0731
+          temperature: 0.0
+
+---
+spring:
+  config:
+    activate:
+      on-profile: k8s
+
+  datasource:
+    url: jdbc:postgresql://pgvector.appcatalyst-core.svc.cluster.local:5432/intelligence_db
+    username: intelligence_user
+    password: ${DB_PASSWORD}
+
+  ai:
+    openai:
+      api-key: ${AI_API_KEY}
+      timeout: 10m
+      chat:
+        options:
+          model: deepseek/deepseek-v4-flash-0731
+          temperature: 0.0
