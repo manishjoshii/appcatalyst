@@ -22,6 +22,7 @@ spec:
         # 1. THE RUNNER (Vite / Node.js)
         - name: runner
           image: node:20-alpine
+          imagePullPolicy: IfNotPresent
           workingDir: /app
           command: ["/bin/sh", "-c", "sleep infinity"]
           volumeMounts:
@@ -40,6 +41,7 @@ spec:
         # 2. THE SYNCER (MinIO mc)
         - name: syncer
           image: minio/mc
+          imagePullPolicy: IfNotPresent
           command: ["/bin/sh", "-c", "sleep infinity"]
           env:
             - name: MINIO_USER
