@@ -40,13 +40,14 @@ public class KubernetesDeploymentServiceImpl implements DeploymentService {
 
     @Override
     public DeployResponse deploy(Long projectId) {
-        // Dynamically build the domain: project-123.app.domain.com
-        String domain = "project-" + projectId + "." + baseDomain;
+        // Dynamically build the domain: project-x-previews-appcatalyst.manishkjoshi.in
+        String domain = "project-" + projectId + "-" + baseDomain;
 
-        // Use default port 80 format logic for clean URLs, or explicit ports for local testing
-        String formattedUrl = proxyPort.equals("80")
-                ? "http://" + domain
-                : "http://" + domain + ":" + proxyPort;
+        // Use HTTPS for port 80/443 (Cloudflare), or explicit HTTP:port for local testing
+        String protocol = (proxyPort.equals("80") || proxyPort.equals("443")) ? "https://" : "http://";
+        String formattedUrl = (proxyPort.equals("80") || proxyPort.equals("443"))
+                ? protocol + domain
+                : protocol + domain + ":" + proxyPort;
 
         Pod existingPod = findActivePod(projectId);
 
@@ -73,6 +74,8 @@ public class KubernetesDeploymentServiceImpl implements DeploymentService {
         Pod pod = client.pods().inNamespace(namespace)
                 .withLabel(POOL_LABEL, IDLE)
                 .list().getItems().stream()
+                .filter(p -> p.getMetadata().getDeletionTimestamp() == null
+                        && "Running".equalsIgnoreCase(p.getStatus().getPhase()))
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("No idle runners available. Please scale up the runner-pool."));
 

@@ -30,7 +30,7 @@ metadata:
   name: appcatalyst-shared-config
   namespace: appcatalyst-core
 data:
-  PREVIEW_DOMAIN: "previews.appcatalyst.manishkjoshi.in"
+  PREVIEW_DOMAIN: "previews-appcatalyst.manishkjoshi.in"
   PREVIEW_NAMESPACE: "appcatalyst-previews"
   PROXY_PORT: "80"
   APP_FRONTEND_URL: "https://appcatalyst-studio.manishkjoshi.in"
